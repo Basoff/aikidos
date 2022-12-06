@@ -1142,19 +1142,19 @@ function pre_resource_loaded() {
 
   resource_manager.load(resource_loaded);
 
-  var audio = document.createElement("audio");
-  audio.src = "/aikidos/audio/theme.wav";
-  audio.addEventListener(
-    "ended",
-    function () {
-      // Wait 500 milliseconds before next loop
-      setTimeout(function () {
-        audio.play();
-      }, 500);
-    },
-    false
-  );
-  audio.play();
+  // var audio = document.createElement("audio");
+  // audio.src = "/aikidos/audio/theme.wav";
+  // audio.addEventListener(
+  //   "ended",
+  //   function () {
+  //     // Wait 500 milliseconds before next loop
+  //     setTimeout(function () {
+  //       audio.play();
+  //     }, 500);
+  //   },
+  //   false
+  // );
+  // audio.play();
 }
 
 function document_on_load() {
@@ -1162,13 +1162,32 @@ function document_on_load() {
   resource_manager.add_image(REL_PATH + "images/loading_background.png");
 
   resource_manager.load(pre_resource_loaded);
-  var audio = document.createElement("audio");
+  // var audio = document.createElement("audio");
 }
 
 export default {
   name: "AikidosGame",
+  data() {
+    return {
+      themeAudio: null,
+    };
+  },
   mounted() {
     document_on_load();
+    this.themeAudio = new Audio("/aikidos/audio/theme.wav"); // path to file
+    this.playThemeMusic();
+  },
+  methods: {
+    playThemeMusic() {
+      this.themeAudio.play();
+    },
+    pauseThemeMusic() {
+      this.themeAudio.pause();
+    },
+    stopThemeMusic() {
+      this.pauseThemeMusic();
+      this.themeAudio.currentTime = 0;
+    },
   },
 };
 </script>
