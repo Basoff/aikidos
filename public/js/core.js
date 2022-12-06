@@ -1073,7 +1073,9 @@ function pre_resource_loaded() {
 
   timer = setInterval(draw, 1000 / FPS);
 
-  resource_manager.add_image(REL_PATH + "images/choose_game_type.png");
+  // resource_manager.add_image(REL_PATH + "images/choose_game_type.png"); // 2
+
+  resource_manager.add_image(REL_PATH + "images/start_screen.png"); // 2. Вместо того меню что было подгружаем это изображение
   resource_manager.add_image(REL_PATH + "images/records_background.png");
   resource_manager.add_image(REL_PATH + "images/novice_background.png");
   resource_manager.add_image(REL_PATH + "images/master_background.png");

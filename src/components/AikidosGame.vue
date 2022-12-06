@@ -7,8 +7,10 @@
 <script>
 // import { loadScript } from "vue-plugin-load-script";
 
-var CANVAS_WIDTH = 600;
-var CANVAS_HEIGHT = 400;
+// Растягиваем канвас по размеру окна
+var CANVAS_WIDTH = window.innerWidth; // 600
+var CANVAS_HEIGHT = window.innerHeight; // 400
+var FIGHT_AREA_WIDTH = 400;
 var FPS = 25;
 var INC = 0.5;
 var ACCUMULATOR = 0;
@@ -135,6 +137,10 @@ function CResourceImage(src) {
     };
     //	this._image.addEventListener('load',function() { on_load.on_res_load.call(on_load) },false);
     this._image.src = this._src;
+    if (this._src.indexOf("novice_background") != -1) {
+      this._image.style = "min-width: 6000px; object-fit: cover";
+      console.log(this._image.style);
+    }
   };
 }
 
@@ -386,7 +392,7 @@ function draw_number(res, x, y, w, h, score) {
   var digit;
   var i = 1;
 
-  if (score == 0)
+  if (score == 0) {
     context2D.drawImage(
       resource_manager.res_list[res]._image,
       0,
@@ -398,7 +404,7 @@ function draw_number(res, x, y, w, h, score) {
       w,
       h
     );
-  else
+  } else
     while (digit_score) {
       digit_score = (digit_score / 10) | 0;
       pow10 = Math.pow(10, i);
@@ -424,12 +430,24 @@ function render() {
   context2D.fillStyle = "#000000";
   context2D.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   if (stage == -2 || pre_load_timer >= 0) {
-    context2D.drawImage(resource_manager.res_list[1]._image, 0, 0);
+    // Растягиваем стартовый загрузочный экран
+    context2D.drawImage(
+      resource_manager.res_list[1]._image,
+      0,
+      0,
+      CANVAS_WIDTH,
+      600
+    );
+    //  context2D.drawImage(
+    //   resource_manager.res_list[1]._image,
+    //   0,
+    //   0,
+    // );
 
     context2D.save();
-    context2D.translate(414 + 15.5, 343 + 14);
+    context2D.translate(414 + 25.5, 343 + 14);
     context2D.rotate(load_angle);
-    context2D.drawImage(resource_manager.res_list[0]._image, -15.5, -14);
+    context2D.drawImage(resource_manager.res_list[0]._image, -25.5, -14);
     context2D.restore();
     load_angle -= Math.PI / 20;
 
@@ -437,7 +455,16 @@ function render() {
 
     if (pre_load_timer > 2000 && stage == -1) pre_load_timer = -1;
   } else if (stage == -1) {
-    context2D.drawImage(resource_manager.res_list[2]._image, 0, 0);
+    // Растягиваем меню
+    // context2D.drawImage(resource_manager.res_list[2]._image, 0, 0);
+    context2D.drawImage(
+      resource_manager.res_list[2]._image,
+      0,
+      0,
+      CANVAS_WIDTH,
+      600
+    );
+
     if (show_masters)
       context2D.drawImage(resource_manager.res_list[6]._image, 0, 354);
     if (novice_highlight)
@@ -517,10 +544,13 @@ function render() {
 		context2D.fillStyle='#112233';
 		roundRect(context2D,10,10,100,100,3,true,false);*/
   } else {
+    // Растягиваем фон во время боя по размеру канваса
     context2D.drawImage(
       resource_manager.res_list[current_game_type == 0 ? 4 : 5]._image,
       0,
-      0
+      0,
+      CANVAS_WIDTH,
+      FIGHT_AREA_WIDTH
     );
     if (current_game_type == 0) {
       if (game_mouse)
@@ -543,7 +573,9 @@ function render() {
 
     var score = ((current_score * FPS) / 1000) | 0;
 
-    draw_number(12, 580, 20, 24, 32, score);
+    // Перемещаем отрисовку очков к левому углу
+    draw_number(12, CANVAS_WIDTH - 30, 20, 24, 32, score);
+    // draw_number(12, CANVAS_WIDTH - 100, 20, 24, 32, score);
 
     var qu = ((score / QU_DELTA) | 0) + 1;
     qu = Math.max(11 - qu, 1);
@@ -763,14 +795,15 @@ function OnMouseMove(e) {
     show_masters = false;
     choose_url = false;
 
+    // Убираем подсветку карточек режимов игры и кнопки списка лучших мастеров
     if (x > 4 && y > 139 && x < 266 && y < 283) {
-      novice_highlight = true;
+      // novice_highlight = true;
     }
     if (x > 311 && y > 161 && x < 595 && y < 308) {
-      master_highlight = true;
+      // master_highlight = true;
     }
     if (x > 20 && y > 363 && x < 236 && y < 386) {
-      show_masters = true;
+      // show_masters = true;
     }
     if (x > 499 && y > 363 && x < 580 && y < 386) {
       choose_url = true;
@@ -843,8 +876,9 @@ function OnMouseUp(e) {
   var x = e.offsetX == undefined ? e.layerX : e.offsetX;
   var y = e.offsetY == undefined ? e.layerY : e.offsetY;
 
+  // Перемещаем кнопку для начала игры в нижний левый угол
   if (stage == -1 && pre_load_timer < 0) {
-    if (x > 4 && y > 139 && x < 266 && y < 283) {
+    if (x > 10 && y > 550 && x < 275 && y < 600) {
       start_game(0);
     }
     if (x > 311 && y > 161 && x < 595 && y < 308) {
