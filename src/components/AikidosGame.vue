@@ -1212,7 +1212,8 @@ export default {
   },
   mounted() {
     document_on_load();
-    this.themeAudio = new Audio("/aikidos/audio/theme.wav"); // path to file
+    this.themeAudio = new Audio("/aikidos/audio/theme.wav");
+    this.themeAudio.loop = true;
     this.playThemeMusic();
   },
   methods: {
