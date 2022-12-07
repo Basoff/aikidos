@@ -11,6 +11,10 @@
 var CANVAS_WIDTH = window.innerWidth; // 600
 var CANVAS_HEIGHT = window.innerHeight; // 400
 var FIGHT_AREA_WIDTH = 400;
+window.addEventListener("resize", () => {
+  CANVAS_WIDTH = window.innerWidth;
+  CANVAS_HEIGHT = window.innerHeight;
+});
 var FPS = 25;
 var INC = 0.5;
 var ACCUMULATOR = 0;
