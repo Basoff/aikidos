@@ -11,6 +11,7 @@
 var CANVAS_WIDTH = window.innerWidth; // 600
 var CANVAS_HEIGHT = window.innerHeight; // 400
 var FIGHT_AREA_WIDTH = 400;
+// Держим размер канваса всегда в соотвествии с окном
 window.addEventListener("resize", () => {
   CANVAS_WIDTH = window.innerWidth;
   CANVAS_HEIGHT = window.innerHeight;
@@ -74,51 +75,6 @@ var on_scroll, on_scroll_move;
 
 var req = null;
 var sreq = null;
-var isIE = false;
-var first_table = false;
-function load_table() {
-  url = REL_PATH + "proxy.php";
-
-  if (req == null) {
-    first_table = true;
-    if (window.XMLHttpRequest) {
-      req = new XMLHttpRequest();
-      req.onreadystatechange = processReqChange;
-      req.open("GET", url, true);
-      req.send(null);
-    } else if (window.ActiveXObject) {
-      isIE = true;
-      req = new ActiveXObject("Microsoft.XMLHTTP");
-      if (req) {
-        req.onreadystatechange = processReqChange;
-        req.open("GET", url, true);
-        req.send();
-      }
-    }
-  } else {
-    req.abort();
-    first_table = true;
-    req.open("GET", url, true);
-    if (isIE) req.send();
-    else req.send(null);
-  }
-}
-
-function processReqChange() {
-  if (req.readyState == 4) {
-    if (req.status == 200) {
-      table_list = eval("(" + req.responseText + ")");
-      table_page_count = [
-        get_keys_count(table_list[0]) - 7,
-        get_keys_count(table_list[1]) - 7,
-      ];
-      table_scroll_delta = [
-        table_page_count[0] > 0 ? 130 / table_page_count[0] : 0,
-        table_page_count[1] > 0 ? 130 / table_page_count[1] : 0,
-      ];
-    }
-  }
-}
 
 function get_keys_count(obj) {
   var count = 0;
@@ -144,26 +100,6 @@ function CResourceImage(src) {
     if (this._src.indexOf("novice_background") != -1) {
       this._image.style = "min-width: 6000px; object-fit: cover";
       console.log(this._image.style);
-    }
-  };
-}
-
-function CResourceAudio(src) {
-  this._src = src;
-
-  CResourceAudio.prototype.load = function (on_load) {};
-
-  var loop_handler = function () {
-    this.currentTime = 0;
-    this.play();
-  };
-
-  CResourceAudio.prototype.set_loop = function (loop) {
-    if (typeof this._audio.loop == "boolean") {
-      this._audio.loop = loop;
-    } else {
-      if (loop) this._audio.addEventListener("ended", loop_handler, false);
-      else this._audio.removeEventListener("ended", loop_handler, false);
     }
   };
 }
@@ -202,6 +138,7 @@ var current_frame_player = 0,
   success_attack = -1,
   enemy_pos = CANVAS_WIDTH,
   emo = 0;
+
 var ticks = 0;
 var timer;
 
@@ -349,32 +286,6 @@ LoadingElement.draw = function () {
 };
 
 var load_angle = 0;
-
-function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-  if (typeof stroke == "undefined") {
-    stroke = true;
-  }
-  if (typeof radius === "undefined") {
-    radius = 5;
-  }
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-  if (stroke) {
-    ctx.stroke();
-  }
-  if (fill) {
-    ctx.fill();
-  }
-}
 
 function get_digit_count(number) {
   if (number == 0) return 1;
@@ -916,56 +827,6 @@ function OnMouseUp(e) {
   } else if (stage == 3) {
     show_main_window();
     return;
-    sound_fade_to = 0.6;
-
-    var score = ((current_score * FPS) / 1000) | 0;
-    if (add_score) {
-      add_score = false;
-      add_new_score = false;
-      new_name = edit.value;
-      game.removeChild(edit);
-      var sreq;
-      var url =
-        REL_PATH +
-        "proxy.php?game_type=" +
-        current_game_type +
-        "&player_name=" +
-        encodeURI(new_name) +
-        "&player_score=" +
-        score;
-      if (window.XMLHttpRequest) {
-        sreq = new XMLHttpRequest();
-        sreq.onreadystatechange = function () {};
-        sreq.open("GET", url, true);
-        sreq.send(null);
-      } else if (window.ActiveXObject) {
-        sreq = new ActiveXObject("Microsoft.XMLHTTP");
-        if (sreq) {
-          sreq.onreadystatechange = function () {};
-          sreq.open("GET", url, true);
-          sreq.send();
-        }
-      }
-      show_records(current_game_type ? 0 : 1);
-    } else if (
-      (current_game_type == 0 &&
-        (score > score_data.novice.min_score ||
-          score_data.novice.count < 100)) ||
-      (current_game_type == 1 &&
-        (score > score_data.master.min_score || score_data.master.count < 100))
-    ) {
-      if (x > 230 && y > 225 && x < 370 && y < 245) {
-        add_new_score = true;
-        new_name = "АЙКИДОКА";
-        edit.value = new_name;
-        game.appendChild(edit);
-        edit.focus();
-      } else if (x > 230 && y > 225 && x < 370 && y < 275) {
-        show_main_window();
-      }
-    } else if (x > 230 && y > 235 && x < 370 && y < 255) {
-      show_main_window();
-    }
   }
 }
 
@@ -1027,11 +888,6 @@ function score_loaded() {
       resource_manager.res_list[39]._audio.play();
     }
   }
-}
-
-function coda_ended() {
-  resource_manager.res_list[40].set_loop(true);
-  if (sound_enabled) resource_manager.res_list[40]._audio.play();
 }
 
 function show_records(table_type) {
@@ -1200,7 +1056,6 @@ function document_on_load() {
   resource_manager.add_image(REL_PATH + "images/loading_background.png");
 
   resource_manager.load(pre_resource_loaded);
-  // var audio = document.createElement("audio");
 }
 
 export default {
