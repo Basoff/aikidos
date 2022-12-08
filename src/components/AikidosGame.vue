@@ -5,7 +5,8 @@
 </template>
 
 <script>
-// import { loadScript } from "vue-plugin-load-script";
+import { gameManual } from "src/constants/texts";
+import { wrapText } from "src/lib/canvasLib";
 
 // Растягиваем канвас по размеру окна
 var CANVAS_WIDTH = window.innerWidth; // 600
@@ -360,9 +361,10 @@ function render() {
     // );
 
     context2D.save();
-    context2D.translate(414 + 25.5, 343 + 14);
+    var koef = 25.5;
+    context2D.translate(CANVAS_WIDTH / 2 - koef, 343 + 14);
     context2D.rotate(load_angle);
-    context2D.drawImage(resource_manager.res_list[0]._image, -25.5, -14);
+    context2D.drawImage(resource_manager.res_list[0]._image, -koef, -14);
     context2D.restore();
     load_angle -= Math.PI / 20;
 
@@ -379,6 +381,19 @@ function render() {
       CANVAS_WIDTH,
       600
     );
+
+    var oldFont = context2D.font;
+    var xKoef = 100;
+    var yKoef = 300;
+    context2D.font = "48px serif";
+    wrapText(context2D, gameManual, xKoef, yKoef, CANVAS_WIDTH - xKoef * 2);
+    // context2D.fillText(
+    //   gameManual,
+    //   xKoef,
+    //   CANVAS_HEIGHT / 2,
+    //   CANVAS_WIDTH - xKoef * 2
+    // );
+    context2D.font = oldFont;
 
     if (show_masters)
       context2D.drawImage(resource_manager.res_list[6]._image, 0, 354);
