@@ -33,7 +33,7 @@ var pre_load_timer = 0;
 var current_score = 0;
 var QU_DELTA = 15;
 var DAN_DELTA = 20;
-var REL_PATH = "/aikidos/";
+var REL_PATH = "/";
 
 var enemy_type = 0;
 var start_hit_frame = 5;
@@ -383,10 +383,19 @@ function render() {
     );
 
     var oldFont = context2D.font;
-    var xKoef = 100;
+    var xKoef = CANVAS_WIDTH / 17;
     var yKoef = 300;
-    context2D.font = "48px serif";
-    wrapText(context2D, gameManual, xKoef, yKoef, CANVAS_WIDTH - xKoef * 2);
+    var fontSize = CANVAS_WIDTH > 780 ? CANVAS_WIDTH / 30 : CANVAS_WIDTH / 13;
+    var lineHeight = CANVAS_HEIGHT / 25;
+    context2D.font = fontSize + "px serif";
+    wrapText(
+      context2D,
+      gameManual,
+      xKoef,
+      yKoef,
+      CANVAS_WIDTH - xKoef * 2,
+      lineHeight
+    );
     // context2D.fillText(
     //   gameManual,
     //   xKoef,
