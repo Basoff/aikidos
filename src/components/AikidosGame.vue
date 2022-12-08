@@ -1208,6 +1208,7 @@ export default {
   data() {
     return {
       themeAudio: null,
+      f: 4,
     };
   },
   mounted() {
@@ -1215,6 +1216,9 @@ export default {
     this.themeAudio = new Audio("/aikidos/audio/theme.wav");
     this.themeAudio.loop = true;
     this.playThemeMusic();
+  },
+  beforeUnmount() {
+    this.stopThemeMusic();
   },
   methods: {
     playThemeMusic() {
