@@ -33,7 +33,7 @@ var pre_load_timer = 0;
 var current_score = 0;
 var QU_DELTA = 15;
 var DAN_DELTA = 20;
-var REL_PATH = "/";
+var REL_PATH = "";
 
 var enemy_type = 0;
 var start_hit_frame = 5;
@@ -1092,8 +1092,9 @@ export default {
   },
   mounted() {
     document_on_load();
-    this.themeAudio = new Audio("/audio/theme.wav");
+    this.themeAudio = new Audio("audio/theme.wav");
     this.themeAudio.loop = true;
+    this.themeAudio.defaultMuted = true;
     this.playThemeMusic();
   },
   beforeUnmount() {
