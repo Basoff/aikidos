@@ -2,6 +2,7 @@
   <body
     id="game_body relative-position"
     style="min-height: 50px"
+    class="wrapper"
     onLoad="document_on_load();"
   >
     <q-btn
@@ -11,25 +12,9 @@
       @click="muteThemeMusic"
       :icon="isMuted ? 'volume_off' : 'volume_up'"
     />
-    <div id="game" class="wrapper"></div>
+    <div id="game"></div>
   </body>
 </template>
-
-<style>
-.mute_btn {
-  position: absolute;
-  left: calc(50vw - 40px);
-  top: 60px;
-}
-.wrapper {
-  width: 100vw !important;
-  height: 100vh !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: black;
-}
-</style>
 
 <script>
 import { gameManual } from "src/constants/texts";

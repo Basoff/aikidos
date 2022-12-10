@@ -1,0 +1,90 @@
+.mute_btn {
+  position: absolute;
+  left: calc(50vw - 40px);
+  top: 60px;
+}
+.wrapper {
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: black;
+}
+#game {
+  width: 600px;
+  height: 400px;
+  transform: scale(1.5);
+}
+
+#game canvas {
+  /*position: relative;
+    top: 0;
+    left: 0;
+    z-index: 0;*/
+}
+
+#game input {
+  position: relative;
+  border: 10px solid black;
+  outline: none;
+  text-align: center;
+  z-index: 1;
+}
+
+.page {
+  position: relative;
+  width: inherit;
+  height: inherit;
+}
+
+@media (max-width: 920px) {
+  #game {
+    transform: scale(1.4);
+  }
+}
+@media (max-width: 850px) {
+  #game {
+    transform: scale(1.3);
+  }
+}
+@media (max-width: 790px) {
+  #game {
+    transform: scale(1.2);
+  }
+}
+@media (max-width: 725px) {
+  #game {
+    transform: scale(1.1);
+  }
+}
+@media (max-width: 670px) {
+  #game {
+    transform: scale(1);
+  }
+}
+@media (max-width: 610px) {
+  #game {
+    transform: scale(0.8);
+  }
+}
+@media (max-width: 490px) {
+  #game {
+    transform: scale(0.7);
+  }
+}
+@media (max-width: 420px) {
+  #game {
+    transform: scale(0.6);
+  }
+}
+@media (max-width: 370px) {
+  #game {
+    transform: scale(0.5);
+  }
+}
+@media (max-width: 300px) {
+  #game {
+    transform: scale(0.4);
+  }
+}
