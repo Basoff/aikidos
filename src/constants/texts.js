@@ -1,2 +1,2 @@
 export const gameManual =
-  "Текст текст текст тектс тектс Текст текст текст тектс тектс Текст текст текст тектс тектс \n Текст текст текст тектс тектс Текст текст текст тектс тектс";
+  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam alias odit laudantium doloribus, magnam reiciendis cum praesentium. Ipsa totam voluptatem sequi fugit commodi, necessitatibus, facilis accusantium enim porro, numquam assumenda!";

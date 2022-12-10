@@ -14,14 +14,19 @@
   background: black;
 }
 </style>
-
 <script>
 import { gameManual } from "src/constants/texts";
-import { indexImageInResourse } from "src/constants/resourses";
 import { wrapText } from "src/lib/canvasLib";
 
-var CANVAS_WIDTH = 600;
-var CANVAS_HEIGHT = 400;
+// Растягиваем канвас по размеру окна
+var CANVAS_WIDTH = 600; // window.innerWidth; // 600
+var CANVAS_HEIGHT = 400; //window.innerHeight; // 400
+var FIGHT_AREA_WIDTH = 400;
+// Держим размер канваса всегда в соотвествии с окном
+// window.addEventListener("resize", () => {
+//   CANVAS_WIDTH = window.innerWidth;
+//   CANVAS_HEIGHT = window.innerHeight;
+// });
 var FPS = 25;
 var INC = 0.5;
 var ACCUMULATOR = 0;
@@ -39,15 +44,19 @@ var current_score = 0;
 var QU_DELTA = 15;
 var DAN_DELTA = 20;
 var REL_PATH = "";
+
 var enemy_type = 0;
 var start_hit_frame = 5;
 var end_hit_frame = 60;
+
 var sound_enabled = 0;
 var sound_fade_to = 0;
 var sound_current = 0;
 var PLAYER_FIRST_IMAGE;
+
 var current_game_type;
 var score_data;
+
 var show_masters = false;
 var novice_highlight = false;
 var master_highlight = false;
@@ -68,56 +77,16 @@ var goto_list = false;
 var add_new_score = false;
 var add_score = false;
 var new_name = "";
+
 var table_list;
 var table_pos;
 var table_page_count;
 var table_scroll_delta;
 var on_scroll, on_scroll_move;
+
 var req = null;
 var sreq = null;
-var isIE = false;
-var first_table = false;
-function load_table() {
-  url = REL_PATH + "proxy.php";
-  if (req == null) {
-    first_table = true;
-    if (window.XMLHttpRequest) {
-      req = new XMLHttpRequest();
-      req.onreadystatechange = processReqChange;
-      req.open("GET", url, true);
-      req.send(null);
-    } else if (window.ActiveXObject) {
-      isIE = true;
-      req = new ActiveXObject("Microsoft.XMLHTTP");
-      if (req) {
-        req.onreadystatechange = processReqChange;
-        req.open("GET", url, true);
-        req.send();
-      }
-    }
-  } else {
-    req.abort();
-    first_table = true;
-    req.open("GET", url, true);
-    if (isIE) req.send();
-    else req.send(null);
-  }
-}
-function processReqChange() {
-  if (req.readyState == 4) {
-    if (req.status == 200) {
-      table_list = eval("(" + req.responseText + ")");
-      table_page_count = [
-        get_keys_count(table_list[0]) - 7,
-        get_keys_count(table_list[1]) - 7,
-      ];
-      table_scroll_delta = [
-        table_page_count[0] > 0 ? 130 / table_page_count[0] : 0,
-        table_page_count[1] > 0 ? 130 / table_page_count[1] : 0,
-      ];
-    }
-  }
-}
+
 function get_keys_count(obj) {
   var count = 0;
   for (var k in obj) {
@@ -127,8 +96,10 @@ function get_keys_count(obj) {
   }
   return count;
 }
+
 function CResourceImage(src) {
   this._src = src;
+
   CResourceImage.prototype.load = function (on_load) {
     this._image = new Image();
     this._image.alt = "Image";
@@ -137,38 +108,31 @@ function CResourceImage(src) {
     };
     //	this._image.addEventListener('load',function() { on_load.on_res_load.call(on_load) },false);
     this._image.src = this._src;
-  };
-}
-function CResourceAudio(src) {
-  this._src = src;
-  CResourceAudio.prototype.load = function (on_load) {};
-  var loop_handler = function () {
-    this.currentTime = 0;
-    this.play();
-  };
-  CResourceAudio.prototype.set_loop = function (loop) {
-    if (typeof this._audio.loop == "boolean") {
-      this._audio.loop = loop;
-    } else {
-      if (loop) this._audio.addEventListener("ended", loop_handler, false);
-      else this._audio.removeEventListener("ended", loop_handler, false);
+    if (this._src.indexOf("novice_background") != -1) {
+      this._image.style = "min-width: 6000px; object-fit: cover";
+      console.log(this._image.style);
     }
   };
 }
+
 function CResourceManager() {
   this.res_list = [];
   this.loaded = 0;
+
   CResourceManager.prototype.add_image = function (res) {
     this.res_list[this.res_list.length] = new CResourceImage(res);
   };
+
   /*	CResourceManager.prototype.add_audio=function(res){
 		this.res_list[this.res_list.length]=new CResourceAudio(res);
 	};
 */
   CResourceManager.prototype.on_res_load = function () {
     this.loaded++;
+
     if (this.loaded == this.res_list.length) this.on_load();
   };
+
   CResourceManager.prototype.load = function (on_load) {
     this.on_load = on_load;
     for (var i = this.loaded; i < this.res_list.length; i++) {
@@ -176,6 +140,7 @@ function CResourceManager() {
     }
   };
 }
+
 var resource_manager = new CResourceManager();
 var current_frame_player = 0,
   current_frame_enemy = 0,
@@ -184,8 +149,10 @@ var current_frame_player = 0,
   success_attack = -1,
   enemy_pos = CANVAS_WIDTH,
   emo = 0;
+
 var ticks = 0;
 var timer;
+
 function update() {
   if (sound_fade_to != sound_current) {
     var smaller = sound_fade_to < sound_current;
@@ -204,10 +171,13 @@ function update() {
       current_frame_player = 0;
       emo = 0;
     }
+
     if (pre_stage == 0) {
       enemy_pos -= enemy_speed;
     }
+
     current_frame_enemy++;
+
     if (current_game_type == 0) {
       game_mouse =
         enemy_pos > 196 + start_hit_frame && enemy_pos < 196 + end_hit_frame;
@@ -226,11 +196,13 @@ function update() {
         game_r =
           enemy_pos > 196 + start_hit_frame && enemy_pos < 196 + end_hit_frame;
     }
+
     if (pre_stage == 0 && enemy_pos <= 196) {
       pre_stage = 1;
       current_frame_enemy = 0;
       enemy_pos = 196;
     }
+
     if (current_frame_enemy == (pre_stage == 0 ? 12 : 0)) {
       if (pre_stage == 1) {
         current_frame_player = 0;
@@ -240,6 +212,7 @@ function update() {
       }
       current_frame_enemy = 0;
     }
+
     if (success_attack != 0) {
       current_score++;
     }
@@ -272,13 +245,16 @@ function update() {
         enemy_speed += 0.3;
         enemy_type = (Math.random() * 4) | 0;
         if (enemy_type == 4) enemy_type = 3;
+
         emo = (1 + Math.random() * 3) | 0;
         if (emo == 4) emo = 3;
       } else stage = 3;
     }
+
     if (success_attack != 0) current_score++;
   }
 }
+
 var LoadingElement = {
   position: 0,
   RGB: { r: 0, g: 0, b: 0, a: 1.0 },
@@ -289,6 +265,7 @@ LoadingElement.draw = function () {
   var x, y, part;
   for (i = 0; i < this.desc.count; i++) {
     part = Math.max(1 - i / this.desc.count, 0.2);
+
     context2D.fillStyle =
       "rgba(" +
       this.RGB.r +
@@ -300,8 +277,10 @@ LoadingElement.draw = function () {
       (this.RGB.a - i / (this.desc.count - 1)) +
       ")";
     context2D.beginPath();
+
     x = Math.cos(this.position - step * i - Math.PI / 2) * this.desc.radius;
     y = Math.sin(this.position - step * i - Math.PI / 2) * this.desc.radius;
+
     context2D.arc(
       this.desc.x + x,
       this.desc.y + y,
@@ -310,53 +289,36 @@ LoadingElement.draw = function () {
       2 * Math.PI,
       false
     );
+
     context2D.closePath();
     context2D.fill();
   }
   this.position += ((2 * Math.PI) / FPS) * this.desc.speed;
 };
+
 var load_angle = 0;
-function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-  if (typeof stroke == "undefined") {
-    stroke = true;
-  }
-  if (typeof radius === "undefined") {
-    radius = 5;
-  }
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-  if (stroke) {
-    ctx.stroke();
-  }
-  if (fill) {
-    ctx.fill();
-  }
-}
+
 function get_digit_count(number) {
   if (number == 0) return 1;
+
   var digit_score = number;
   var c = 0;
+
   while (digit_score) {
     digit_score = (digit_score / 10) | 0;
     c++;
   }
+
   return c;
 }
+
 function draw_number(res, x, y, w, h, score) {
   var digit_score = score;
   var pow10;
   var digit;
   var i = 1;
-  if (score == 0)
+
+  if (score == 0) {
     context2D.drawImage(
       resource_manager.res_list[res]._image,
       0,
@@ -368,7 +330,7 @@ function draw_number(res, x, y, w, h, score) {
       w,
       h
     );
-  else
+  } else
     while (digit_score) {
       digit_score = (digit_score / 10) | 0;
       pow10 = Math.pow(10, i);
@@ -388,34 +350,53 @@ function draw_number(res, x, y, w, h, score) {
       i++;
     }
 }
+
 function render() {
   context2D.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   context2D.fillStyle = "#000000";
   context2D.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   if (stage == -2 || pre_load_timer >= 0) {
-    context2D.drawImage(resource_manager.res_list[1]._image, 0, 0);
+    // Растягиваем стартовый загрузочный экран
+    context2D.drawImage(
+      resource_manager.res_list[1]._image,
+      0,
+      0,
+      CANVAS_WIDTH,
+      600
+    );
+    //  context2D.drawImage(
+    //   resource_manager.res_list[1]._image,
+    //   0,
+    //   0,
+    // );
+
     context2D.save();
-    context2D.translate(414 + 15.5, 343 + 14);
+    var koef = 25.5;
+    context2D.translate(CANVAS_WIDTH / 2 - koef, 343 + 14);
     context2D.rotate(load_angle);
-    context2D.drawImage(resource_manager.res_list[0]._image, -15.5, -14);
+    context2D.drawImage(resource_manager.res_list[0]._image, -koef, -14);
     context2D.restore();
     load_angle -= Math.PI / 20;
+
     pre_load_timer += 1000 / FPS;
+
     if (pre_load_timer > 2000 && stage == -1) pre_load_timer = -1;
   } else if (stage == -1) {
+    // Растягиваем меню
+    // context2D.drawImage(resource_manager.res_list[2]._image, 0, 0);
     context2D.drawImage(
       resource_manager.res_list[2]._image,
       0,
       0,
       CANVAS_WIDTH,
-      400
+      600
     );
 
     var oldFont = context2D.font;
     var xKoef = CANVAS_WIDTH / 17;
-    var yKoef = 185;
-    var fontSize = 22;
-    var lineHeight = 30;
+    var yKoef = 300;
+    var fontSize = CANVAS_WIDTH > 780 ? CANVAS_WIDTH / 30 : CANVAS_WIDTH / 13;
+    var lineHeight = CANVAS_HEIGHT / 25;
     context2D.font = fontSize + "px serif";
     wrapText(
       context2D,
@@ -425,26 +406,16 @@ function render() {
       CANVAS_WIDTH - xKoef * 2,
       lineHeight
     );
+    // context2D.fillText(
+    //   gameManual,
+    //   xKoef,
+    //   CANVAS_HEIGHT / 2,
+    //   CANVAS_WIDTH - xKoef * 2
+    // );
     context2D.font = oldFont;
 
-    // Рисуем кнопку начать игру
-    var startGameX = 20;
-    var startGameY = 360;
-    context2D.drawImage(
-      resource_manager.res_list[indexImageInResourse.START_GAME_BUTTON]._image,
-      startGameX,
-      startGameY
-    );
     if (show_masters)
-      // context2D.drawImage(resource_manager.res_list[6]._image, 0, 354);
-      // Hightlight for GameStart
-      context2D.drawImage(
-        resource_manager.res_list[
-          indexImageInResourse.START_GAME_BUTTON_HIGHLIGHT
-        ]._image,
-        startGameX,
-        startGameY
-      );
+      context2D.drawImage(resource_manager.res_list[6]._image, 0, 354);
     if (novice_highlight)
       context2D.drawImage(resource_manager.res_list[7]._image, 0, 105);
     if (master_highlight)
@@ -457,16 +428,19 @@ function render() {
       context2D.drawImage(resource_manager.res_list[32]._image, 10, 361);
     if (records_url)
       context2D.drawImage(resource_manager.res_list[31]._image, 490, 361);
+
     if (current_table == 0)
       context2D.drawImage(resource_manager.res_list[27]._image, 30, 140);
     else if (records_master)
       context2D.drawImage(resource_manager.res_list[26]._image, 30, 140);
     else context2D.drawImage(resource_manager.res_list[25]._image, 30, 140);
+
     if (current_table == 1)
       context2D.drawImage(resource_manager.res_list[30]._image, 190, 140);
     else if (records_novice)
       context2D.drawImage(resource_manager.res_list[29]._image, 190, 140);
     else context2D.drawImage(resource_manager.res_list[28]._image, 190, 140);
+
     var iCount = get_keys_count(table_list[current_table]);
     if (iCount > 0) {
       context2D.font = "11pt Calibri,sans-serif";
@@ -477,6 +451,7 @@ function render() {
       var dan;
       for (var i = 0; i < 7; i++) {
         item = table_list[current_table][table_pos[current_table] + i];
+
         context2D.fillText(
           table_pos[current_table] + i + 1 + ".",
           43,
@@ -484,6 +459,7 @@ function render() {
         );
         context2D.fillText(item.player_name, 80, 166 + i * 24);
         context2D.textAlign = "center";
+
         qu = ((item.player_score / QU_DELTA) | 0) + 1;
         qu = Math.max(11 - qu, 1);
         dan = 0;
@@ -491,6 +467,7 @@ function render() {
           dan = (((item.player_score - 10 * QU_DELTA) / DAN_DELTA) | 0) + 1;
           dan = Math.min(dan, 10);
         }
+
         context2D.fillText(
           dan == 0 ? qu + " кю" : dan + " дан",
           337,
@@ -498,8 +475,10 @@ function render() {
         );
         context2D.textAlign = "left";
         context2D.fillText(item.player_score, 425, 166 + i * 24);
+
         if (table_pos[current_table] + i + 1 >= iCount) break;
       }
+
       if (table_page_count[current_table] > 0) {
         var x = 554,
           y =
@@ -514,10 +493,13 @@ function render() {
 		context2D.fillStyle='#112233';
 		roundRect(context2D,10,10,100,100,3,true,false);*/
   } else {
+    // Растягиваем фон во время боя по размеру канваса
     context2D.drawImage(
       resource_manager.res_list[current_game_type == 0 ? 4 : 5]._image,
       0,
-      0
+      0,
+      CANVAS_WIDTH,
+      FIGHT_AREA_WIDTH
     );
     if (current_game_type == 0) {
       if (game_mouse)
@@ -533,11 +515,17 @@ function render() {
       if (game_r)
         context2D.drawImage(resource_manager.res_list[20]._image, 125, 350);
     }
+
     if (game_url) {
       context2D.drawImage(resource_manager.res_list[10]._image, 494, 364);
     }
+
     var score = ((current_score * FPS) / 1000) | 0;
-    draw_number(12, 580, 20, 24, 32, score);
+
+    // Перемещаем отрисовку очков к левому углу
+    draw_number(12, CANVAS_WIDTH - 30, 20, 24, 32, score);
+    // draw_number(12, CANVAS_WIDTH - 100, 20, 24, 32, score);
+
     var qu = ((score / QU_DELTA) | 0) + 1;
     qu = Math.max(11 - qu, 1);
     var dan = 0;
@@ -545,6 +533,7 @@ function render() {
       dan = (((score - 10 * QU_DELTA) / DAN_DELTA) | 0) + 1;
       dan = Math.min(dan, 10);
     }
+
     if (current_game_type == 0 || dan == 0) {
       draw_number(15, 43, 20, 16, 21, qu);
       context2D.drawImage(resource_manager.res_list[14]._image, 53, 20);
@@ -552,6 +541,7 @@ function render() {
       draw_number(15, 43, 20, 16, 21, dan);
       context2D.drawImage(resource_manager.res_list[35]._image, 53, 17);
     }
+
     if (stage == 0) {
       if (emo)
         context2D.drawImage(
@@ -660,10 +650,12 @@ function render() {
       context2D.fillStyle = "rgba(0,0,0,0.5)";
       context2D.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       context2D.fill();
+
       if (add_new_score) {
         context2D.drawImage(resource_manager.res_list[33]._image, 151, 118);
         if (add_score)
           context2D.drawImage(resource_manager.res_list[34]._image, 250, 234);
+
         /*context2D.font="15pt Calibri,sans-serif";
 				context2D.fillStyle='#000';
 				context2D.textBaseline="top";
@@ -677,15 +669,18 @@ function render() {
 					context2D.drawImage(resource_manager.res_list[23]._image,230,225);
 				if (play_again)
 					context2D.drawImage(resource_manager.res_list[16]._image,230,255);
+
 				draw_number(22,300+get_digit_count(score)*9,155,18,25,score);
 			}
 			else*/
         context2D.drawImage(resource_manager.res_list[11]._image, 150, 118);
         if (play_again)
           context2D.drawImage(resource_manager.res_list[16]._image, 230, 235);
+
         draw_number(22, 300 + get_digit_count(score) * 9, 173, 18, 25, score);
       }
     }
+
     /*context2D.fillStyle='#0000FF';
 		context2D.fillText("|",196+start_hit_frame,70);
 		context2D.fillText("|",196+end_hit_frame,70);
@@ -693,10 +688,12 @@ function render() {
 		context2D.fillText("|",enemy_pos,70);*/
   }
 }
+
 function draw() {
   update();
   render();
 }
+
 function OnKeyDown(e) {
   if (add_new_score) {
     /*if (e.keyCode==8){
@@ -719,36 +716,43 @@ function OnKeyDown(e) {
     }
   }
 }
+
 function OnKeyPress(e) {
   if (add_new_score) {
     /*if (new_name.length<17)
 			new_name+=String.fromCharCode(e.which);*/
   }
 }
+
 function OnResize() {
   game.style.width = CANVAS_WIDTH + "px";
   game.style.height = CANVAS_HEIGHT + "px";
   //game.style.marginLeft=(-CANVAS_WIDTH/2)+'px';
   //game.style.marginTop=(-CANVAS_HEIGHT/2)+'px';
 }
+
 function OnMouseMove(e) {
   //	var x=e.clientX-document.documentElement.scrollLeft-document.getElementById("game").offsetParent.offsetLeft-document.getElementById("game").offsetLeft;
   //    var y=e.clientY+$(window).scrollTop()-document.getElementById("game").offsetParent.offsetTop-document.getElementById("game").offsetTop;
+
   var x = e.offsetX == undefined ? e.layerX : e.offsetX;
   var y = e.offsetY == undefined ? e.layerY : e.offsetY;
+
   if (stage == -1 && pre_load_timer < 0) {
     novice_highlight = false;
     master_highlight = false;
     show_masters = false;
     choose_url = false;
-    // if (x > 4 && y > 139 && x < 266 && y < 283) {
-    //   novice_highlight = true;
-    // }
-    // if (x > 311 && y > 161 && x < 595 && y < 308) {
-    //   master_highlight = true;
-    // }
-    if (x > 20 && y > 363 && x < 236 && y < 390) {
-      show_masters = true;
+
+    // Убираем подсветку карточек режимов игры и кнопки списка лучших мастеров
+    if (x > 4 && y > 139 && x < 266 && y < 283) {
+      // novice_highlight = true;
+    }
+    if (x > 311 && y > 161 && x < 595 && y < 308) {
+      // master_highlight = true;
+    }
+    if (x > 20 && y > 363 && x < 236 && y < 386) {
+      // show_masters = true;
     }
     if (x > 499 && y > 363 && x < 580 && y < 386) {
       choose_url = true;
@@ -758,7 +762,9 @@ function OnMouseMove(e) {
     records_url = false;
     records_master = false;
     records_novice = false;
+
     on_scroll = on_scroll_move;
+
     if (on_scroll_move) {
       var sy = (y < 164 ? 164 : y > 294 ? 294 : y) - 164;
       table_pos[current_table] = Math.round(
@@ -811,27 +817,31 @@ function OnMouseMove(e) {
     }
   }
 }
+
 function OnMouseUp(e) {
   //var x=e.clientX-document.documentElement.scrollLeft-document.getElementById("game").offsetParent.offsetLeft-document.getElementById("game").offsetLeft;
   //var y=e.clientY+$(window).scrollTop()-document.getElementById("game").offsetParent.offsetTop-document.getElementById("game").offsetTop;
+
   var x = e.offsetX == undefined ? e.layerX : e.offsetX;
   var y = e.offsetY == undefined ? e.layerY : e.offsetY;
+
+  // Перемещаем кнопку для начала игры в нижний левый угол
   if (stage == -1 && pre_load_timer < 0) {
-    // if (x > 4 && y > 139 && x < 266 && y < 283) {
-    //   start_game(0);
-    // }
-    // if (x > 311 && y > 161 && x < 595 && y < 308) {
-    //   start_game(1);
-    // }
-    if (x > 20 && y > 363 && x < 236 && y < 386) {
-      // show_records(0);
+    if (x > 10 && y > 550 && x < 275 && y < 600) {
       start_game(0);
+    }
+    if (x > 311 && y > 161 && x < 595 && y < 308) {
+      start_game(1);
+    }
+    if (x > 20 && y > 363 && x < 236 && y < 386) {
+      show_records(0);
     }
     if (x > 499 && y > 363 && x < 580 && y < 386) {
       document.location = "http://www.aikidos.ru";
     }
   } else if (stage == -3) {
     on_scroll_move = false;
+
     if (x > 20 && y > 366 && x < 168 && y < 383) {
       show_main_window();
     }
@@ -851,62 +861,15 @@ function OnMouseUp(e) {
   } else if (stage == 3) {
     show_main_window();
     return;
-    sound_fade_to = 0.6;
-    var score = ((current_score * FPS) / 1000) | 0;
-    if (add_score) {
-      add_score = false;
-      add_new_score = false;
-      new_name = edit.value;
-      game.removeChild(edit);
-      var sreq;
-      var url =
-        REL_PATH +
-        "proxy.php?game_type=" +
-        current_game_type +
-        "&player_name=" +
-        encodeURI(new_name) +
-        "&player_score=" +
-        score;
-      if (window.XMLHttpRequest) {
-        sreq = new XMLHttpRequest();
-        sreq.onreadystatechange = function () {};
-        sreq.open("GET", url, true);
-        sreq.send(null);
-      } else if (window.ActiveXObject) {
-        sreq = new ActiveXObject("Microsoft.XMLHTTP");
-        if (sreq) {
-          sreq.onreadystatechange = function () {};
-          sreq.open("GET", url, true);
-          sreq.send();
-        }
-      }
-      show_records(current_game_type ? 0 : 1);
-    } else if (
-      (current_game_type == 0 &&
-        (score > score_data.novice.min_score ||
-          score_data.novice.count < 100)) ||
-      (current_game_type == 1 &&
-        (score > score_data.master.min_score || score_data.master.count < 100))
-    ) {
-      if (x > 230 && y > 225 && x < 370 && y < 245) {
-        add_new_score = true;
-        new_name = "АЙКИДОКА";
-        edit.value = new_name;
-        game.appendChild(edit);
-        edit.focus();
-      } else if (x > 230 && y > 225 && x < 370 && y < 275) {
-        show_main_window();
-      }
-    } else if (x > 230 && y > 235 && x < 370 && y < 255) {
-      show_main_window();
-    }
   }
 }
+
 function OnMouseDown(e) {
   //var x=e.clientX-document.documentElement.scrollLeft-document.getElementById("game").offsetParent.offsetLeft-document.getElementById("game").offsetLeft;
   //var y=e.clientY+$(window).scrollTop()-document.getElementById("game").offsetParent.offsetTop-document.getElementById("game").offsetTop;
   var x = e.offsetX == undefined ? e.layerX : e.offsetX;
   var y = e.offsetY == undefined ? e.layerY : e.offsetY;
+
   if (stage == -3) {
     if (on_scroll) on_scroll_move = true;
   }
@@ -920,6 +883,7 @@ function OnMouseDown(e) {
     }
   }
 }
+
 function resource_loaded() {
   var url = REL_PATH + "proxy.php?score=0";
   if (window.XMLHttpRequest) {
@@ -936,6 +900,7 @@ function resource_loaded() {
     }
   }
 }
+
 function score_loaded() {
   if (sreq.readyState == 4) {
     if (sreq.status == 200) {
@@ -946,9 +911,11 @@ function score_loaded() {
       }
     }
     show_main_window();
+
     sound_fade_to = 0.6;
     //resource_manager.res_list[39]._audio.volume=sound_current;
     //resource_manager.res_list[40]._audio.volume=sound_current;
+
     //resource_manager.res_list[39]._audio.addEventListener('ended',coda_ended,false);
     if (sound_enabled) {
       resource_manager.res_list[39].set_loop(true);
@@ -956,33 +923,37 @@ function score_loaded() {
     }
   }
 }
-function coda_ended() {
-  resource_manager.res_list[40].set_loop(true);
-  if (sound_enabled) resource_manager.res_list[40]._audio.play();
-}
+
 function show_records(table_type) {
   records_back = false;
   records_url = false;
   records_master = false;
   records_novice = false;
   current_table = table_type;
+
   table_list = [[], []];
   table_pos = [0, 0];
   table_page_count = [0, 0];
   on_scroll = false;
   on_scroll_move = false;
+
   // load_table();
+
   stage = -3;
 }
+
 function show_main_window() {
   novice_highlight = false;
   master_highlight = false;
   show_masters = false;
   choose_url = false;
+
   stage = -1;
 }
+
 function start_game(game_type) {
   current_game_type = game_type;
+
   game_url = false;
   game_mouse = false;
   game_q = false;
@@ -991,6 +962,7 @@ function start_game(game_type) {
   game_r = false;
   play_again = false;
   goto_list = false;
+
   enemy_pos = CANVAS_WIDTH;
   current_frame_player = 0;
   success_attack = -1;
@@ -998,15 +970,20 @@ function start_game(game_type) {
   enemy_type = 0;
   enemy_speed = start_enemy_speed;
   current_score = 0;
+
   stage = 0;
+
   sound_fade_to = 0.3;
 }
+
 function pre_resource_loaded() {
   game = document.getElementById("game");
+
   pages[0] = document.createElement("canvas");
   pages[0].width = CANVAS_WIDTH;
   pages[0].height = CANVAS_HEIGHT;
   context2D = pages[0].getContext("2d");
+
   /*	edit=document.createElement('input');
 	edit.type='text';
 	edit.maxLength="17";
@@ -1017,6 +994,7 @@ function pre_resource_loaded() {
 	edit.style.fontSize="15pt";
 	*/
   OnResize();
+
   window.addEventListener("resize", OnResize, false);
   window.addEventListener("orientationchange", OnResize, false);
   window.addEventListener("keypress", OnKeyPress, false);
@@ -1024,10 +1002,14 @@ function pre_resource_loaded() {
   pages[0].addEventListener("mouseup", OnMouseUp, false);
   pages[0].addEventListener("mousedown", OnMouseDown, false);
   pages[0].addEventListener("mousemove", OnMouseMove, false);
+
   game.appendChild(pages[0]);
+
   LoadingElement.desc.x = CANVAS_WIDTH / 2;
   LoadingElement.desc.y = 250;
+
   timer = setInterval(draw, 1000 / FPS);
+
   resource_manager.add_image(REL_PATH + "images/choose_game_type.png");
   resource_manager.add_image(REL_PATH + "images/records_background.png");
   resource_manager.add_image(REL_PATH + "images/novice_background.png");
@@ -1065,10 +1047,13 @@ function pre_resource_loaded() {
   resource_manager.add_image(REL_PATH + "images/player_emo_1.png");
   resource_manager.add_image(REL_PATH + "images/player_emo_2.png");
   resource_manager.add_image(REL_PATH + "images/player_emo_3.png");
+
   //resource_manager.add_audio(REL_PATH+'audio/coda16.wav');
   //resource_manager.add_audio(REL_PATH+'audio/theme16.wav');
   //resource_manager.add_audio(REL_PATH+'audio/theme.wav');
+
   PLAYER_FIRST_IMAGE = resource_manager.res_list.length;
+
   resource_manager.add_image(REL_PATH + "images/player_stand.png");
   resource_manager.add_image(REL_PATH + "images/enemy_run_1.png");
   resource_manager.add_image(REL_PATH + "images/fail_1.png");
@@ -1083,11 +1068,8 @@ function pre_resource_loaded() {
   resource_manager.add_image(REL_PATH + "images/fail_4.png");
   resource_manager.add_image(REL_PATH + "images/success_4.png");
 
-  // Новые файлы
-  resource_manager.add_image(REL_PATH + "images/game_start_button.png");
-  resource_manager.add_image(REL_PATH + "images/game_start_highlight.png");
-  console.log(resource_manager);
   resource_manager.load(resource_loaded);
+
   // var audio = document.createElement("audio");
   // audio.src = "/aikidos/audio/theme.wav";
   // audio.addEventListener(
@@ -1102,23 +1084,31 @@ function pre_resource_loaded() {
   // );
   // audio.play();
 }
+
 function document_on_load() {
   resource_manager.add_image(REL_PATH + "images/loading_circle.png");
   resource_manager.add_image(REL_PATH + "images/loading_background.png");
+
   resource_manager.load(pre_resource_loaded);
-  // var audio = document.createElement("audio");
 }
+
 export default {
   name: "AikidosGame",
   data() {
     return {
       themeAudio: null,
+      f: 4,
     };
   },
   mounted() {
     document_on_load();
     this.themeAudio = new Audio("audio/theme.wav");
+    this.themeAudio.loop = true;
+    this.themeAudio.defaultMuted = true;
     this.playThemeMusic();
+  },
+  beforeUnmount() {
+    this.stopThemeMusic();
   },
   methods: {
     playThemeMusic() {
