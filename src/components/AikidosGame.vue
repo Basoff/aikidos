@@ -1,10 +1,26 @@
 <template>
-  <body id="game_body" style="min-height: 50px" onLoad="document_on_load();">
+  <body
+    id="game_body relative-position"
+    style="min-height: 50px"
+    onLoad="document_on_load();"
+  >
+    <q-btn
+      class="mute_btn"
+      color="grey-7"
+      rounded
+      @click="muteThemeMusic"
+      :icon="isMuted ? 'volume_off' : 'volume_up'"
+    />
     <div id="game" class="wrapper"></div>
   </body>
 </template>
 
 <style>
+.mute_btn {
+  position: absolute;
+  left: calc(50vw - 40px);
+  top: 60px;
+}
 .wrapper {
   width: 100vw !important;
   height: 100vh !important;
@@ -827,9 +843,9 @@ function OnMouseUp(e) {
       // show_records(0);
       start_game(0);
     }
-    if (x > 499 && y > 363 && x < 580 && y < 386) {
-      document.location = "http://www.aikidos.ru";
-    }
+    // if (x > 499 && y > 363 && x < 580 && y < 386) {
+    //   document.location = "http://www.aikidos.ru";
+    // }
   } else if (stage == -3) {
     on_scroll_move = false;
     if (x > 20 && y > 366 && x < 168 && y < 383) {
@@ -1113,12 +1129,22 @@ export default {
   data() {
     return {
       themeAudio: null,
+      isMuted: true,
     };
   },
   mounted() {
     document_on_load();
     this.themeAudio = new Audio("audio/theme.wav");
-    this.playThemeMusic();
+    this.themeAudio.muted = true;
+  },
+  beforeUnmount() {
+    this.stopThemeMusic();
+  },
+  computed: {
+    isThemeMusicMuted() {
+      if (!this.themeAudio) return "warning";
+      return this.themeAudio.muted;
+    },
   },
   methods: {
     playThemeMusic() {
@@ -1130,6 +1156,14 @@ export default {
     stopThemeMusic() {
       this.pauseThemeMusic();
       this.themeAudio.currentTime = 0;
+    },
+    muteThemeMusic() {
+      this.themeAudio.muted = !this.themeAudio.muted;
+      this.isMuted = this.themeAudio.muted;
+      this.pauseThemeMusic();
+      if (!this.themeAudio.muted) {
+        this.playThemeMusic();
+      }
     },
   },
 };
