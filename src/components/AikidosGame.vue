@@ -37,6 +37,9 @@ var ENEMY_WIDTH = 200;
 var PLAYER_HEIGHT = 240;
 var pre_load_timer = 0;
 var current_score = 0;
+
+var successHitsCount = 0;
+
 var QU_DELTA = 15;
 var DAN_DELTA = 20;
 var REL_PATH = "";
@@ -521,8 +524,17 @@ function render() {
       0
     );
     if (current_game_type == 0) {
-      if (game_mouse)
+      if (game_mouse) {
+        if (successHitsCount <= 3) {
+          context2D.drawImage(
+            resource_manager.res_list[indexImageInResourse.GO_ACTION_POPUP]
+              ._image,
+            CANVAS_WIDTH / 2 - 45,
+            100
+          );
+        }
         context2D.drawImage(resource_manager.res_list[21]._image, 20, 339);
+      }
     }
     if (current_game_type == 1) {
       if (game_q)
@@ -918,6 +930,9 @@ function OnMouseDown(e) {
         success_attack =
           enemy_pos > 196 + start_hit_frame && enemy_pos < 196 + end_hit_frame;
         enemy_pos = 196;
+        if (success_attack) {
+          successHitsCount += 1;
+        }
       }
     }
   }
@@ -1002,6 +1017,7 @@ function start_game(game_type) {
   current_score = 0;
   stage = 0;
   sound_fade_to = 0.3;
+  successHitsCount = 0;
 }
 function pre_resource_loaded() {
   game = document.getElementById("game");
@@ -1088,6 +1104,7 @@ function pre_resource_loaded() {
   // Новые файлы
   resource_manager.add_image(REL_PATH + "images/game_start_button.png");
   resource_manager.add_image(REL_PATH + "images/game_start_highlight.png");
+  resource_manager.add_image(REL_PATH + "images/go_action.png");
   console.log(resource_manager);
   resource_manager.load(resource_loaded);
   // var audio = document.createElement("audio");
