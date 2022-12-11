@@ -88,3 +88,24 @@
     transform: scale(0.4);
   }
 }
+
+@media (max-height: 560px) {
+  #game {
+    transform: scale(0.9);
+  }
+}
+@media (max-height: 332px) {
+  #game {
+    transform: scale(0.7);
+  }
+}
+@media (max-height: 284px) {
+  #game {
+    transform: scale(0.6);
+  }
+}
+@media (max-height: 244px) {
+  #game {
+    transform: scale(0.5);
+  }
+}
