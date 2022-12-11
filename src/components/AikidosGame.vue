@@ -850,7 +850,8 @@ function OnMouseUp(e) {
       document.location = "http://www.aikidos.ru";
     }
   } else if (stage == 3) {
-    show_main_window();
+    // show_main_window();
+    start_game(0);
     return;
     sound_fade_to = 0.6;
     var score = ((current_score * FPS) / 1000) | 0;
