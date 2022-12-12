@@ -5,14 +5,15 @@
     class="wrapper"
     onLoad="document_on_load();"
   >
-    <q-btn
-      class="mute_btn"
-      color="grey-7"
-      rounded
-      @click="muteThemeMusic"
-      :icon="isMuted ? 'volume_off' : 'volume_up'"
-    />
-    <div id="game"></div>
+    <div id="game">
+      <q-btn
+        class="mute_btn"
+        color="grey-7"
+        rounded
+        @click="muteThemeMusic"
+        :icon="isMuted ? 'volume_off' : 'volume_up'"
+      />
+    </div>
   </body>
 </template>
 
@@ -20,6 +21,8 @@
 import { gameManual } from "src/constants/texts";
 import { indexImageInResourse } from "src/constants/resourses";
 import { wrapText } from "src/lib/canvasLib";
+
+var successHitsCount = 0;
 
 var CANVAS_WIDTH = 600;
 var CANVAS_HEIGHT = 400;
@@ -37,8 +40,6 @@ var ENEMY_WIDTH = 200;
 var PLAYER_HEIGHT = 240;
 var pre_load_timer = 0;
 var current_score = 0;
-
-var successHitsCount = 0;
 
 var QU_DELTA = 15;
 var DAN_DELTA = 20;
