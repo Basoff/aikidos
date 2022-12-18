@@ -757,13 +757,13 @@ function OnMouseMove(e) {
     // if (x > 311 && y > 161 && x < 595 && y < 308) {
     //   master_highlight = true;
     // }
-    var startGameX = CANVAS_WIDTH / 2 - 110;
-    var startGameY = CANVAS_HEIGHT / 2;
+    var buttonPosX = CANVAS_WIDTH / 2 - 110;
+    var buttonPosY = CANVAS_HEIGHT / 2;
     if (
-      x > startGameX &&
-      y > startGameY &&
-      x < startGameX + 210 &&
-      y < startGameY + 40
+      x > buttonPosX &&
+      y > buttonPosY &&
+      x < buttonPosX + 210 &&
+      y < buttonPosY + 40
     ) {
       show_masters = true;
     }
