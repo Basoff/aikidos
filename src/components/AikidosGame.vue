@@ -417,24 +417,20 @@ function render() {
     );
 
     var oldFont = context2D.font;
-    var xKoef = CANVAS_WIDTH / 17;
-    var yKoef = 185;
-    var fontSize = 22;
-    var lineHeight = 30;
-    context2D.font = fontSize + "px serif";
-    wrapText(
-      context2D,
-      gameManual,
-      xKoef,
-      yKoef,
-      CANVAS_WIDTH - xKoef * 2,
-      lineHeight
-    );
+    var xKoef = CANVAS_WIDTH / 2;
+    var yKoef = CANVAS_HEIGHT / 2 + 47;
+    var fontSize = 17;
+    var lineHeight = 20;
+    context2D.font = "italic " + fontSize + "px serif";
+    context2D.style = "font-style: italic";
+    context2D.textBaseline = "middle";
+    context2D.textAlign = "center";
+    wrapText(context2D, gameManual, xKoef, yKoef, 300, lineHeight);
     context2D.font = oldFont;
 
     // Рисуем кнопку начать игру
-    var startGameX = 20;
-    var startGameY = 360;
+    var startGameX = CANVAS_WIDTH / 2 - 110;
+    var startGameY = CANVAS_HEIGHT / 2;
     context2D.drawImage(
       resource_manager.res_list[indexImageInResourse.START_GAME_BUTTON]._image,
       startGameX,
@@ -761,7 +757,14 @@ function OnMouseMove(e) {
     // if (x > 311 && y > 161 && x < 595 && y < 308) {
     //   master_highlight = true;
     // }
-    if (x > 20 && y > 363 && x < 236 && y < 390) {
+    var startGameX = CANVAS_WIDTH / 2 - 110;
+    var startGameY = CANVAS_HEIGHT / 2;
+    if (
+      x > startGameX &&
+      y > startGameY &&
+      x < startGameX + 210 &&
+      y < startGameY + 40
+    ) {
       show_masters = true;
     }
     if (x > 499 && y > 363 && x < 580 && y < 386) {

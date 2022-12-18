@@ -1,2 +1,2 @@
 export const gameManual =
-  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam alias odit laudantium doloribus, magnam reiciendis cum praesentium. Ipsa totam voluptatem sequi fugit commodi, necessitatibus, facilis accusantium enim porro, numquam assumenda!";
+  "Чтобы стать мастером айкидо, победи всех соперников. Для выполнения приёма нужно вовремя тапнуть по экрану.";
