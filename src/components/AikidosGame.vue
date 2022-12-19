@@ -82,6 +82,11 @@ var req = null;
 var sreq = null;
 var isIE = false;
 var first_table = false;
+
+// Positions of components
+var startGameButtonX = CANVAS_WIDTH / 2 - 110;
+var startGameButtonY = CANVAS_HEIGHT / 2;
+
 function load_table() {
   url = REL_PATH + "proxy.php";
   if (req == null) {
@@ -429,12 +434,11 @@ function render() {
     context2D.font = oldFont;
 
     // Рисуем кнопку начать игру
-    var startGameX = CANVAS_WIDTH / 2 - 110;
-    var startGameY = CANVAS_HEIGHT / 2;
+
     context2D.drawImage(
       resource_manager.res_list[indexImageInResourse.START_GAME_BUTTON]._image,
-      startGameX,
-      startGameY
+      startGameButtonX,
+      startGameButtonY
     );
     if (show_masters)
       // context2D.drawImage(resource_manager.res_list[6]._image, 0, 354);
@@ -443,8 +447,8 @@ function render() {
         resource_manager.res_list[
           indexImageInResourse.START_GAME_BUTTON_HIGHLIGHT
         ]._image,
-        startGameX,
-        startGameY
+        startGameButtonX,
+        startGameButtonY
       );
     if (novice_highlight)
       context2D.drawImage(resource_manager.res_list[7]._image, 0, 105);
@@ -757,13 +761,12 @@ function OnMouseMove(e) {
     // if (x > 311 && y > 161 && x < 595 && y < 308) {
     //   master_highlight = true;
     // }
-    var buttonPosX = CANVAS_WIDTH / 2 - 110;
-    var buttonPosY = CANVAS_HEIGHT / 2;
+
     if (
-      x > buttonPosX &&
-      y > buttonPosY &&
-      x < buttonPosX + 210 &&
-      y < buttonPosY + 40
+      x > startGameButtonX &&
+      y > startGameButtonY &&
+      x < startGameButtonX + 210 &&
+      y < startGameButtonY + 40
     ) {
       show_masters = true;
     }
