@@ -86,6 +86,8 @@ var first_table = false;
 // Positions of components
 var startGameButtonX = CANVAS_WIDTH / 2 - 110;
 var startGameButtonY = CANVAS_HEIGHT / 2;
+var startGameButtonWidth = 220;
+var startGameButtonHeight = 50;
 
 function load_table() {
   url = REL_PATH + "proxy.php";
@@ -843,7 +845,13 @@ function OnMouseUp(e) {
     // if (x > 311 && y > 161 && x < 595 && y < 308) {
     //   start_game(1);
     // }
-    if (x > 20 && y > 363 && x < 236 && y < 386) {
+
+    if (
+      x > startGameButtonX &&
+      y > startGameButtonY &&
+      x < startGameButtonX + startGameButtonWidth &&
+      y < startGameButtonY + startGameButtonHeight
+    ) {
       // show_records(0);
       start_game(0);
     }
