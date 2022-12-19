@@ -96,21 +96,21 @@
 
 @media (max-height: 560px) {
   #game {
-    transform: scale(0.9);
+    transform: scale(1.12, 0.9);
   }
 }
 @media (max-height: 332px) {
   #game {
-    transform: scale(0.7);
+    transform: scale(1, 0.8);
   }
 }
 @media (max-height: 284px) {
   #game {
-    transform: scale(0.6);
+    transform: scale(1.6, 0.6);
   }
 }
 @media (max-height: 244px) {
   #game {
-    transform: scale(0.5);
+    transform: scale(1.6, 0.5);
   }
 }

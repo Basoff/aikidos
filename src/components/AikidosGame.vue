@@ -53,7 +53,7 @@ var sound_current = 0;
 var PLAYER_FIRST_IMAGE;
 var current_game_type;
 var score_data;
-var show_masters = false;
+var gameStartButtonHover = false;
 var novice_highlight = false;
 var master_highlight = false;
 var choose_url = false;
@@ -363,11 +363,13 @@ function get_digit_count(number) {
   }
   return c;
 }
-function draw_number(res, x, y, w, h, score) {
+function draw_number(res, x, y, w, h, score, color = null) {
   var digit_score = score;
   var pow10;
   var digit;
   var i = 1;
+  // context2D.font = "15pt bold Calibri,sans-serif";
+  // context2D.fillText(res, x - w * i, y);
   if (score == 0)
     context2D.drawImage(
       resource_manager.res_list[res]._image,
@@ -442,7 +444,7 @@ function render() {
       startGameButtonX,
       startGameButtonY
     );
-    if (show_masters)
+    if (gameStartButtonHover)
       // context2D.drawImage(resource_manager.res_list[6]._image, 0, 354);
       // Hightlight for GameStart
       context2D.drawImage(
@@ -477,7 +479,7 @@ function render() {
     var iCount = get_keys_count(table_list[current_table]);
     if (iCount > 0) {
       context2D.font = "11pt Calibri,sans-serif";
-      context2D.fillStyle = "#000";
+      context2D.fillStyle = "black";
       context2D.textBaseline = "top";
       var item;
       var qu;
@@ -498,6 +500,8 @@ function render() {
           dan = (((item.player_score - 10 * QU_DELTA) / DAN_DELTA) | 0) + 1;
           dan = Math.min(dan, 10);
         }
+        let oldStyle = context.fillStyle;
+        context.fillStyle = "black";
         context2D.fillText(
           dan == 0 ? qu + " кю" : dan + " дан",
           337,
@@ -505,6 +509,7 @@ function render() {
         );
         context2D.textAlign = "left";
         context2D.fillText(item.player_score, 425, 166 + i * 24);
+        context.fillStyle = oldStyle;
         if (table_pos[current_table] + i + 1 >= iCount) break;
       }
       if (table_page_count[current_table] > 0) {
@@ -553,7 +558,7 @@ function render() {
       context2D.drawImage(resource_manager.res_list[10]._image, 494, 364);
     }
     var score = ((current_score * FPS) / 1000) | 0;
-    draw_number(12, 580, 20, 24, 32, score);
+    draw_number(12, 580, 20, 17, 32, score);
     var qu = ((score / QU_DELTA) | 0) + 1;
     qu = Math.max(11 - qu, 1);
     var dan = 0;
@@ -755,7 +760,7 @@ function OnMouseMove(e) {
   if (stage == -1 && pre_load_timer < 0) {
     novice_highlight = false;
     master_highlight = false;
-    show_masters = false;
+    gameStartButtonHover = false;
     choose_url = false;
     // if (x > 4 && y > 139 && x < 266 && y < 283) {
     //   novice_highlight = true;
@@ -770,7 +775,7 @@ function OnMouseMove(e) {
       x < startGameButtonX + 210 &&
       y < startGameButtonY + 40
     ) {
-      show_masters = true;
+      gameStartButtonHover = true;
     }
     if (x > 499 && y > 363 && x < 580 && y < 386) {
       choose_url = true;
@@ -1009,7 +1014,7 @@ function show_records(table_type) {
 function show_main_window() {
   novice_highlight = false;
   master_highlight = false;
-  show_masters = false;
+  gameStartButtonHover = false;
   choose_url = false;
   stage = -1;
 }
