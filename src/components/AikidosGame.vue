@@ -23,6 +23,7 @@ import { indexImageInResourse } from "src/constants/resourses";
 import { wrapText } from "src/lib/canvasLib";
 
 var successHitsCount = 0;
+var loadTimeout = 3000;
 
 var CANVAS_WIDTH = 600;
 var CANVAS_HEIGHT = 400;
@@ -958,40 +959,52 @@ function OnMouseDown(e) {
   }
 }
 function resource_loaded() {
-  var url = REL_PATH + "proxy.php?score=0";
-  if (window.XMLHttpRequest) {
-    sreq = new XMLHttpRequest();
-    sreq.onreadystatechange = score_loaded;
-    sreq.open("GET", url, true);
-    sreq.send(null);
-  } else if (window.ActiveXObject) {
-    sreq = new ActiveXObject("Microsoft.XMLHTTP");
-    sreq.onreadystatechange = score_loaded;
-    if (sreq) {
-      sreq.open("GET", url, true);
-      sreq.send();
-    }
-  }
+  setTimeout(() => {
+    score_loaded();
+  }, loadTimeout);
+  // var url = REL_PATH + "proxy.php?score=0";
+  // if (window.XMLHttpRequest) {
+  //   sreq = new XMLHttpRequest();
+  //   sreq.onreadystatechange = score_loaded;
+  //   sreq.open("GET", url, true);
+  //   sreq.send(null);
+  // } else if (window.ActiveXObject) {
+  //   sreq = new ActiveXObject("Microsoft.XMLHTTP");
+  //   sreq.onreadystatechange = score_loaded;
+  //   if (sreq) {
+  //     sreq.open("GET", url, true);
+  //     sreq.send();
+  //   }
+  // }
 }
 function score_loaded() {
-  if (sreq.readyState == 4) {
-    if (sreq.status == 200) {
-      try {
-        score_data = eval("(" + sreq.responseText + ")");
-      } catch (e) {
-        score_data = 0;
-      }
-    }
-    show_main_window();
-    sound_fade_to = 0.6;
-    //resource_manager.res_list[39]._audio.volume=sound_current;
-    //resource_manager.res_list[40]._audio.volume=sound_current;
-    //resource_manager.res_list[39]._audio.addEventListener('ended',coda_ended,false);
-    if (sound_enabled) {
-      resource_manager.res_list[39].set_loop(true);
-      resource_manager.res_list[39]._audio.play();
-    }
+  show_main_window();
+  sound_fade_to = 0.6;
+  //resource_manager.res_list[39]._audio.volume=sound_current;
+  //resource_manager.res_list[40]._audio.volume=sound_current;
+  //resource_manager.res_list[39]._audio.addEventListener('ended',coda_ended,false);
+  if (sound_enabled) {
+    resource_manager.res_list[39].set_loop(true);
+    resource_manager.res_list[39]._audio.play();
   }
+  // if (sreq.readyState == 4) {
+  //   if (sreq.status == 200) {
+  //     try {
+  //       score_data = eval("(" + sreq.responseText + ")");
+  //     } catch (e) {
+  //       score_data = 0;
+  //     }
+  //   }
+  //   show_main_window();
+  //   sound_fade_to = 0.6;
+  //   //resource_manager.res_list[39]._audio.volume=sound_current;
+  //   //resource_manager.res_list[40]._audio.volume=sound_current;
+  //   //resource_manager.res_list[39]._audio.addEventListener('ended',coda_ended,false);
+  //   if (sound_enabled) {
+  //     resource_manager.res_list[39].set_loop(true);
+  //     resource_manager.res_list[39]._audio.play();
+  //   }
+  // }
 }
 function coda_ended() {
   resource_manager.res_list[40].set_loop(true);
