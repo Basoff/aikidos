@@ -99,7 +99,7 @@
     transform: scale(1.12, 0.9);
   }
 }
-@media (max-height: 332px) {
+@media (max-height: 385px) {
   #game {
     transform: scale(1, 0.8);
   }

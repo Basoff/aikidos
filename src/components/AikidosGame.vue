@@ -85,7 +85,7 @@ var first_table = false;
 
 // Positions of components
 var startGameButtonX = CANVAS_WIDTH / 2 - 110;
-var startGameButtonY = CANVAS_HEIGHT / 2;
+var startGameButtonY = CANVAS_HEIGHT / 2 + 80;
 var startGameButtonWidth = 220;
 var startGameButtonHeight = 50;
 
@@ -426,8 +426,8 @@ function render() {
     );
 
     var oldFont = context2D.font;
-    var xKoef = CANVAS_WIDTH / 2;
-    var yKoef = CANVAS_HEIGHT / 2 + 47;
+    var xKoef = startGameButtonX + 106;
+    var yKoef = startGameButtonY - 80;
     var fontSize = 17;
     var lineHeight = 20;
     context2D.font = "italic " + fontSize + "px serif";
