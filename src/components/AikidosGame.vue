@@ -558,7 +558,7 @@ function render() {
       context2D.drawImage(resource_manager.res_list[10]._image, 494, 364);
     }
     var score = ((current_score * FPS) / 1000) | 0;
-    draw_number(12, 580, 20, 17, 32, score);
+    draw_number(12, 580, 20, 24, 32, score);
     var qu = ((score / QU_DELTA) | 0) + 1;
     qu = Math.max(11 - qu, 1);
     var dan = 0;
