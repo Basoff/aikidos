@@ -86,7 +86,7 @@ var first_table = false;
 
 // Positions of components
 var startGameButtonX = CANVAS_WIDTH / 2 - 110;
-var startGameButtonY = CANVAS_HEIGHT / 2 + 80;
+var startGameButtonY = CANVAS_HEIGHT / 2 + 90;
 var startGameButtonWidth = 220;
 var startGameButtonHeight = 50;
 
@@ -424,6 +424,22 @@ function render() {
       0,
       CANVAS_WIDTH,
       400
+    );
+
+    context2D.drawImage(
+      resource_manager.res_list[indexImageInResourse.CHEL1]._image,
+      CANVAS_WIDTH - 170,
+      170,
+      120,
+      160
+    );
+
+    context2D.drawImage(
+      resource_manager.res_list[indexImageInResourse.CHEL2]._image,
+      50,
+      190,
+      90,
+      140
     );
 
     var oldFont = context2D.font;
@@ -1138,6 +1154,8 @@ function pre_resource_loaded() {
   resource_manager.add_image(REL_PATH + "images/game_start_button.png");
   resource_manager.add_image(REL_PATH + "images/game_start_highlight.png");
   resource_manager.add_image(REL_PATH + "images/go_action.png");
+  resource_manager.add_image(REL_PATH + "images/new/chel1.png");
+  resource_manager.add_image(REL_PATH + "images/new/chel2.png");
   console.log(resource_manager);
   resource_manager.load(resource_loaded);
   // var audio = document.createElement("audio");
