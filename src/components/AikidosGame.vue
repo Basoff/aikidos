@@ -30,7 +30,8 @@ var CANVAS_HEIGHT = 400;
 var FPS = 25;
 var INC = 0.5;
 var ACCUMULATOR = 0;
-var start_enemy_speed = 11.0;
+var start_enemy_speed = 11.5;
+var increase_speed = 0.5;
 var enemy_speed;
 var context2D;
 var pages = [];
@@ -282,7 +283,7 @@ function update() {
         success_attack = -1;
         stage = 0;
         pre_stage = 0;
-        enemy_speed += 0.3;
+        enemy_speed += increase_speed;
         enemy_type = (Math.random() * 4) | 0;
         if (enemy_type == 4) enemy_type = 3;
         emo = (1 + Math.random() * 3) | 0;
